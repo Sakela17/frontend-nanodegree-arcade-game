@@ -42,17 +42,22 @@ var Engine = (function(global) {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        /* Call our update/render functions, pass along the time delta to
-         * our update function since it may be used for smooth animation.
-         */
-        update(dt);
-        render();
+        if (selector.tester === 0) {
+            resetPlayerMenu();
+        } else {
+            /* Call our update/render functions, pass along the time delta to
+             * our update function since it may be used for smooth animation.
+             */
+            update(dt);
+            render();
+        }
+
+
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
         lastTime = now;
-
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
@@ -64,6 +69,7 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
+
         reset();
         lastTime = Date.now();
         main();
@@ -80,7 +86,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -97,6 +103,20 @@ var Engine = (function(global) {
         player.update();
     }
 
+    function checkCollisions() {
+        allEnemies.forEach(function(enemy) {
+            if (enemy.y === player.y) {
+                if ((enemy.x - 50 < player.x) && (enemy.x + 75 > player.x)) {
+                    //enemy.resetEnemy();
+                    player.resetPlayer();
+                }
+            }
+
+        });
+    }
+
+
+
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -107,13 +127,47 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
+        // var rowImages = [
+        //         'images/water-block.png',   // Top row is water
+        //         'images/stone-block.png',   // Row 1 of 4 of stone
+        //         'images/stone-block.png',   // Row 2 of 4 of stone
+        //         'images/stone-block.png',   // Row 3 of 4 of stone
+        //         'images/stone-block.png',   // Row 4 of 4 of stone
+        //         'images/grass-block.png'    // Row 1 of 1 of grass
+        //     ],
+        //     numRows = 6,
+        //     numCols = 5,
+        //     row, col;
+        //
+        // /* Loop through the number of rows and columns we've defined above
+        //  * and, using the rowImages array, draw the correct image for that
+        //  * portion of the "grid"
+        //  */
+        // for (row = 0; row < numRows; row++) {
+        //     for (col = 0; col < numCols; col++) {
+        //         /* The drawImage function of the canvas' context element
+        //          * requires 3 parameters: the image to draw, the x coordinate
+        //          * to start drawing and the y coordinate to start drawing.
+        //          * We're using our Resources helpers to refer to our images
+        //          * so that we get the benefits of caching these images, since
+        //          * we're using them over and over.
+        //          */
+        //         ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+        //     }
+        // }
+        renderBlocks();
+        renderHearts();
+        renderEntities();
+    }
+
+    function renderBlocks() {
         var rowImages = [
                 'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
+                'images/stone-block.png',   // Row 1 of 4 of stone
+                'images/stone-block.png',   // Row 2 of 4 of stone
+                'images/stone-block.png',   // Row 3 of 4 of stone
+                'images/stone-block.png',   // Row 4 of 4 of stone
+                'images/grass-block.png'    // Row 1 of 1 of grass
             ],
             numRows = 6,
             numCols = 5,
@@ -135,15 +189,39 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-
-        renderEntities();
     }
+
+    function renderHearts() {
+        var heartImage = 'images/Heart.png',
+            numCols = 3,
+            row = -5,
+            imageWidth = 45,
+            imageHeight = 65,
+            col;
+
+        /* Loop through the number of columns defined above to draw Heart images
+         * with defined width and height
+         */
+        for (col = 0; col < numCols; col++) {
+            ctx.drawImage(Resources.get(heartImage), col * 101 / 2, row, imageWidth, imageHeight);
+        }
+
+
+        // ctx.drawImage(Resources.get(heartImage), 0, -5, 45, 65);
+        // //ctx.scale(0.5,0.5);
+        // //ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // ctx.drawImage(Resources.get(heartImage), 101/2, -5, 45, 65);
+        // ctx.drawImage(Resources.get(heartImage), 202/2, -5, 45, 65);
+
+    }
+
 
     /* This function is called by the render function and is called on each game
      * tick. Its purpose is to then call the render functions you have defined
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
+
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
@@ -152,15 +230,72 @@ var Engine = (function(global) {
         });
 
         player.render();
+
+
     }
 
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
-     */
+    //  */
     function reset() {
-        // noop
+        //resetFrame();
+        selector.tester = 0;
+        allPlayers = [];
+        allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
+
+
+        // This listens for key presses and sends the keys to your
+        // Player.handleInput() method. You don't need to modify this.
+
+            // var key = allowedKeys[e.keyCode];
+            //
+            // if (key === "left" && this.x > 0.5) {
+            //     this.x -= 101;
+            //     resetFrame();
+            // } else if (key === "right" && this.x < 404.5) {
+            //     this.x += 101;
+            //     resetFrame();
+            // } else {
+            //     switch (this.x) {
+            //         case(0.5):
+            //             player.sprite = allPlayers[0].sprite;
+            //             player.resetPlayer();
+            //             main();
+            //             break;
+            //         case(101.5):
+            //             player.sprite = allPlayers[1].sprite;
+            //             main();
+            //             break;
+            //         case(202.5):
+            //             player.sprite = allPlayers[2].sprite;
+            //             player.resetPlayer();
+            //             main();
+            //             break;
+            //         case(303.5):
+            //             player.sprite = allPlayers[3].sprite;
+            //             main();
+            //             break;
+            //         case(404.5):
+            //             player.sprite = allPlayers[4].sprite;
+            //             main();
+            //             break;
+            //     }
+            // }
     }
+
+    function resetPlayerMenu() {
+        renderBlocks();
+        selector.render();
+        allPlayers.forEach(function(player) {
+            player.render();
+        });
+    }
+
+
+
+
+
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
@@ -171,7 +306,14 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        'images/Selector.png',
+        'images/Heart.png'
+
     ]);
     Resources.onReady(init);
 
@@ -179,5 +321,9 @@ var Engine = (function(global) {
      * object when run in a browser) so that developers can use it more easily
      * from within their app.js files.
      */
+
     global.ctx = ctx;
+
+    global.init = init;
+
 })(this);
