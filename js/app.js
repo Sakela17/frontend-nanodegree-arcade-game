@@ -66,13 +66,11 @@ var Player = function(url,x,y) {
     this.sprite = url;
     this.x = x;
     this.y = y;
-    this.speed = 0.05;
+    //this.speed = 0.05;
 };
 
 Player.prototype.update = function() {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
+
 
 };
 
@@ -116,11 +114,11 @@ var enemy,
 //
 //}
 
-var playerCatGirl = new Player('images/char-cat-girl.png',0.5,229);
-var playerHornGirl = new Player('images/char-horn-girl.png',101.5,229);
-var playerBoy = new Player('images/char-boy.png',202.5,229);
-var playerPinkGirl = new Player('images/char-pink-girl.png',303.5,229);
-var playerPrincess = new Player('images/char-princess-girl.png',404.5,229);
+var playerCatGirl = new Player('images/char-cat-girl.png', 0.5, 229);
+var playerHornGirl = new Player('images/char-horn-girl.png', 101.5, 229);
+var playerBoy = new Player('images/char-boy.png', 202.5, 229);
+var playerPinkGirl = new Player('images/char-pink-girl.png', 303.5, 229);
+var playerPrincess = new Player('images/char-princess-girl.png', 404.5, 229);
 allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
 
 selector = {
@@ -197,10 +195,38 @@ for (var i = 0; i < 4; i++) {
     enemy = new Enemy();
     allEnemies.push(enemy);
 }
-// for (var y = 0; y < 5; ++y) {
-//     player = new Player(url);
-//     allSprites.push(player);
-// }
+
+var lifeHearts = new Player ('images/Heart.png', 101, -5);
+lifeHearts.imageWidth = 45;
+lifeHearts.imageHeight = 65;
+lifeHearts.count = 3;
+lifeHearts.renderHearts = function(num) {
+    // function renderHearts(num) {
+    //     var heartImage = 'images/Heart.png',
+    //         //numCols = num,
+    //         row = -5,
+    //         imageWidth = 45,
+    //         imageHeight = 65,
+    //         col;
+
+        /* Loop through the number of columns defined above to draw Heart images
+         * with defined width and height
+         */
+        for (var i = 0; i < num; i++) {
+            ctx.drawImage(Resources.get(this.sprite), i * this.x / 2, this.y, this.imageWidth, this.imageHeight);
+        }
+
+
+        // ctx.drawImage(Resources.get(heartImage), 0, -5, 45, 65);
+        // //ctx.scale(0.5,0.5);
+        // //ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // ctx.drawImage(Resources.get(heartImage), 101/2, -5, 45, 65);
+        // ctx.drawImage(Resources.get(heartImage), 202/2, -5, 45, 65);
+
+    // }
+
+
+};
 
 
 

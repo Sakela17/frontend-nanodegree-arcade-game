@@ -105,11 +105,26 @@ var Engine = (function(global) {
 
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
-            if (enemy.y === player.y) {
-                if ((enemy.x - 50 < player.x) && (enemy.x + 75 > player.x)) {
-                    //enemy.resetEnemy();
-                    player.resetPlayer();
-                }
+            if (enemy.y === player.y && enemy.x - 50 < player.x && enemy.x + 75 > player.x) {
+                    if(lifeHearts.count > 0) {
+                        player.resetPlayer();
+                        lifeHearts.count -= 1;
+                        ctx.clearRect(0, -5, 145, 55);
+                        console.log(lifeHearts.count);
+
+                        //lifeHearts.renderHearts(lifeHearts.count);
+
+                    } else {
+                        init();
+                    }
+
+
+
+
+
+
+
+
             }
 
         });
@@ -124,39 +139,9 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        // var rowImages = [
-        //         'images/water-block.png',   // Top row is water
-        //         'images/stone-block.png',   // Row 1 of 4 of stone
-        //         'images/stone-block.png',   // Row 2 of 4 of stone
-        //         'images/stone-block.png',   // Row 3 of 4 of stone
-        //         'images/stone-block.png',   // Row 4 of 4 of stone
-        //         'images/grass-block.png'    // Row 1 of 1 of grass
-        //     ],
-        //     numRows = 6,
-        //     numCols = 5,
-        //     row, col;
-        //
-        // /* Loop through the number of rows and columns we've defined above
-        //  * and, using the rowImages array, draw the correct image for that
-        //  * portion of the "grid"
-        //  */
-        // for (row = 0; row < numRows; row++) {
-        //     for (col = 0; col < numCols; col++) {
-        //         /* The drawImage function of the canvas' context element
-        //          * requires 3 parameters: the image to draw, the x coordinate
-        //          * to start drawing and the y coordinate to start drawing.
-        //          * We're using our Resources helpers to refer to our images
-        //          * so that we get the benefits of caching these images, since
-        //          * we're using them over and over.
-        //          */
-        //         ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
-        //     }
-        // }
+
         renderBlocks();
-        renderHearts();
+        lifeHearts.renderHearts(lifeHearts.count);
         renderEntities();
     }
 
@@ -191,29 +176,6 @@ var Engine = (function(global) {
         }
     }
 
-    function renderHearts() {
-        var heartImage = 'images/Heart.png',
-            numCols = 3,
-            row = -5,
-            imageWidth = 45,
-            imageHeight = 65,
-            col;
-
-        /* Loop through the number of columns defined above to draw Heart images
-         * with defined width and height
-         */
-        for (col = 0; col < numCols; col++) {
-            ctx.drawImage(Resources.get(heartImage), col * 101 / 2, row, imageWidth, imageHeight);
-        }
-
-
-        // ctx.drawImage(Resources.get(heartImage), 0, -5, 45, 65);
-        // //ctx.scale(0.5,0.5);
-        // //ctx.setTransform(1, 0, 0, 1, 0, 0);
-        // ctx.drawImage(Resources.get(heartImage), 101/2, -5, 45, 65);
-        // ctx.drawImage(Resources.get(heartImage), 202/2, -5, 45, 65);
-
-    }
 
 
     /* This function is called by the render function and is called on each game
@@ -243,6 +205,8 @@ var Engine = (function(global) {
         selector.tester = 0;
         allPlayers = [];
         allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
+        lifeHearts.count = 3;
+        //lifeHearts.renderHearts(this.count);
 
 
         // This listens for key presses and sends the keys to your
@@ -290,6 +254,7 @@ var Engine = (function(global) {
         allPlayers.forEach(function(player) {
             player.render();
         });
+        ctx.clearRect(0, -5, 145, 55);
     }
 
 
