@@ -48,6 +48,7 @@ var Engine = (function(global) {
             /* Call our update/render functions, pass along the time delta to
              * our update function since it may be used for smooth animation.
              */
+
             update(dt);
             render();
         }
@@ -100,31 +101,20 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+        //ctx.clearRect(0, -5, 505, 55);
         player.update();
     }
 
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
             if (enemy.y === player.y && enemy.x - 50 < player.x && enemy.x + 75 > player.x) {
-                    if(lifeHearts.count > 0) {
-                        player.resetPlayer();
-                        lifeHearts.count -= 1;
-                        ctx.clearRect(0, -5, 145, 55);
-                        console.log(lifeHearts.count);
-
-                        //lifeHearts.renderHearts(lifeHearts.count);
-
-                    } else {
-                        init();
-                    }
-
-
-
-
-
-
-
-
+                if(hearts.heartCount > 0) {
+                    player.resetPlayer();
+                    hearts.heartCount -= 1;
+                    ctx.clearRect(0, -5, 145, 55);
+                } else {
+                    init();
+                }
             }
 
         });
@@ -141,7 +131,8 @@ var Engine = (function(global) {
     function render() {
 
         renderBlocks();
-        lifeHearts.renderHearts(lifeHearts.count);
+        ctx.clearRect(0, -5, 505, 55);
+        hearts.renderHearts(hearts.heartCount);
         renderEntities();
     }
 
@@ -199,53 +190,14 @@ var Engine = (function(global) {
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
-    //  */
+    */
     function reset() {
-        //resetFrame();
         selector.tester = 0;
         allPlayers = [];
         allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
-        lifeHearts.count = 3;
-        //lifeHearts.renderHearts(this.count);
-
-
-        // This listens for key presses and sends the keys to your
-        // Player.handleInput() method. You don't need to modify this.
-
-            // var key = allowedKeys[e.keyCode];
-            //
-            // if (key === "left" && this.x > 0.5) {
-            //     this.x -= 101;
-            //     resetFrame();
-            // } else if (key === "right" && this.x < 404.5) {
-            //     this.x += 101;
-            //     resetFrame();
-            // } else {
-            //     switch (this.x) {
-            //         case(0.5):
-            //             player.sprite = allPlayers[0].sprite;
-            //             player.resetPlayer();
-            //             main();
-            //             break;
-            //         case(101.5):
-            //             player.sprite = allPlayers[1].sprite;
-            //             main();
-            //             break;
-            //         case(202.5):
-            //             player.sprite = allPlayers[2].sprite;
-            //             player.resetPlayer();
-            //             main();
-            //             break;
-            //         case(303.5):
-            //             player.sprite = allPlayers[3].sprite;
-            //             main();
-            //             break;
-            //         case(404.5):
-            //             player.sprite = allPlayers[4].sprite;
-            //             main();
-            //             break;
-            //     }
-            // }
+        allEnemies = [];
+        spawnEnemies();
+        hearts.heartCount = 3;
     }
 
     function resetPlayerMenu() {
@@ -254,11 +206,16 @@ var Engine = (function(global) {
         allPlayers.forEach(function(player) {
             player.render();
         });
-        ctx.clearRect(0, -5, 145, 55);
+        ctx.clearRect(0, -5, 505, 55);
+
+        //ctx.strokeStyle = "#000000";
+        //ctx.strokeText("Use arrows to choose a player. When ready, hit enter.", 100, 200);
+        ctx.fillStyle = "#000000";
+        ctx.font = "20px Arial";
+        var text = "Use arrows to choose a player. When ready, click enter.";
+        ctx.fillText(text, 5, 30);
+
     }
-
-
-
 
 
 
@@ -284,11 +241,14 @@ var Engine = (function(global) {
 
     /* Assign the canvas' context object to the global variable (the window
      * object when run in a browser) so that developers can use it more easily
-     * from within their app.js files.
+     * from within their app.js file.
      */
-
     global.ctx = ctx;
 
+    /* Assign the init variable to the global variable (the window
+     * object when run in a browser) so the init function can be called
+     * from within the index.html file.
+     */
     global.init = init;
 
 })(this);

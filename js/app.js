@@ -1,19 +1,23 @@
+/**
+ * This file provides the game entities including
+ * a player, random collectible items, and enemies
+ * to avoid.  It also controls game settings and
+ * player movement.
+
+ */
+
+var allEnemies = [];
+var allPlayers = [];
+var enemy,
+    player,
+    selector,
+    hearts;
 
 // Enemies our player must avoid
 var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-
-    this.sprite = 'images/enemy-bug.png';
-    // this.x = 0;
-    // this.y = 312;
     this.x;
-    /* sef-invoking function used to randomly select Y coordinates for enemy objects
-     */
     this.y;
+    this.sprite = 'images/enemy-bug.png';
     this.speed;
 };
 
@@ -40,12 +44,12 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.resetEnemy = function() {
     var yCoordinates = [63, 146, 229, 312];
     this.x = -201;
+    /* Sef-invoking function randomly selects Y coordinates for enemy objects
+     */
     this.y = (function() {
         var choice = Math.floor(Math.random() * yCoordinates.length);
         return yCoordinates[choice];
     })();
-    //this.speed = 200;
-
     this.speed = Math.ceil((Math.random()) * 400) + 100;
 
 };
@@ -62,14 +66,17 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function(url,x,y) {
-    //this.sprite = 'images/char-boy.png';
-    this.sprite = url;
     this.x = x;
     this.y = y;
-    //this.speed = 0.05;
+    this.sprite = url;
+    this.scoreCount = 0;
 };
 
 Player.prototype.update = function() {
+    if (this.y === -20) {
+        this.scoreCount += 10;
+        this.resetPlayer();
+    }
 
 
 };
@@ -81,13 +88,18 @@ Player.prototype.resetPlayer = function() {
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.clearRect(380, -5, 125, 55);
+    ctx.fillStyle = "#000000";
+    ctx.font = "20px Arial";
+    var text = "Score: " + this.scoreCount;
+    ctx.fillText(text, 380, 30);
 };
 
 Player.prototype.handleInput = function(key) {
     if (key === "left" && this.x > 0.5) {
         this.x -= 101;
     } else if (key === "up" && this.y > -20) {
-        this.y === 63 ? this.resetPlayer() : this.y -= 83;
+        this.y -= 83;
     } else if (key === "right" && this.x < 404.5) {
         this.x += 101;
     } else if (key === "down" && this.y < 395) {
@@ -99,11 +111,7 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-var allEnemies = [];
-var allPlayers = [];
-var enemy,
-    player,
-    selector;
+
 
 // function spawnPlayer(x) {
 //     for (var i = 0, len = allPlayers.length; i < len; i++) {
@@ -123,9 +131,9 @@ allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrin
 
 selector = {
     'image': 'images/Selector.png',
-    'tester': 0,
     'x': 202.5,
     'y': 209,
+    'tester': 0,
     'render': function() {
         ctx.drawImage(Resources.get(this.image), this.x, this.y);
     },
@@ -191,44 +199,41 @@ selector = {
 //     selector.handlePlayerSelection(allowedKeys[e.keyCode]);
 // });
 
-for (var i = 0; i < 4; i++) {
-    enemy = new Enemy();
-    allEnemies.push(enemy);
+function spawnEnemies() {
+    for (var i = 0; i < 4; i++) {
+        enemy = new Enemy();
+        allEnemies.push(enemy);
+    }
 }
 
-var lifeHearts = new Player ('images/Heart.png', 101, -5);
-lifeHearts.imageWidth = 45;
-lifeHearts.imageHeight = 65;
-lifeHearts.count = 3;
-lifeHearts.renderHearts = function(num) {
-    // function renderHearts(num) {
-    //     var heartImage = 'images/Heart.png',
-    //         //numCols = num,
-    //         row = -5,
-    //         imageWidth = 45,
-    //         imageHeight = 65,
-    //         col;
 
-        /* Loop through the number of columns defined above to draw Heart images
+hearts = {
+    x: 101,
+    y: -5,
+    sprite: 'images/Heart.png',
+    imageWidth: 45,
+    imageHeight: 65,
+    heartCount: 3,
+    renderHearts: function(count) {
+        /* Loop through the number of hearts passed as parameter to draw Heart images
          * with defined width and height
          */
-        for (var i = 0; i < num; i++) {
+        for (var i = 0; i < count; i++) {
             ctx.drawImage(Resources.get(this.sprite), i * this.x / 2, this.y, this.imageWidth, this.imageHeight);
         }
-
-
-        // ctx.drawImage(Resources.get(heartImage), 0, -5, 45, 65);
-        // //ctx.scale(0.5,0.5);
-        // //ctx.setTransform(1, 0, 0, 1, 0, 0);
-        // ctx.drawImage(Resources.get(heartImage), 101/2, -5, 45, 65);
-        // ctx.drawImage(Resources.get(heartImage), 202/2, -5, 45, 65);
-
-    // }
-
-
+    }
 };
 
+score = {
+    scoreCount: "",
+    renderScore: function() {
+        ctx.fillStyle = "#000000";
+        ctx.font = "20px Arial";
+        var text = "Score: " + scoreCount;
+        ctx.fillText(text, 5, 30);
+    }
 
+};
 
 
 // This listens for key presses and sends the keys to your
