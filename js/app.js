@@ -1,58 +1,66 @@
-/**
- * This file provides the game entities including
- * a player, random collectible items, and enemies
- * to avoid.  It also controls game settings and
- * player movement.
-
- */
+// App.js
+// This file defines the game entities and their methods.
+//
+// a player, random collectible items, and enemies
+// to avoid.  It also controls game settings and
+// player movement.
 
 var allEnemies = [];
-var allPlayers = [];
 var enemy,
     player,
     selector,
     hearts;
 
-// Enemies our player must avoid
+// Enemy constructor
 var Enemy = function() {
-    this.x;
-    this.y;
+    this.x = -201;
+    this.y = (function() {
+        var yCoordinates = [63, 146, 229, 312];
+        // Sef-invoking function randomly selects Y coordinates for enemy objects
+        function f() {
+            var choice = Math.floor(Math.random() * yCoordinates.length);
+            return yCoordinates[choice];
+        }
+        return f();
+    })();
     this.sprite = 'images/enemy-bug.png';
-    this.speed;
+    this.speed = (function() {
+        return Math.ceil(Math.random() * 400 + 100);
+    })()
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    //this.x = this.x + this.speed * dt;
-
+// Update the Enemy position
+// Invoked by a function in forEach method that iterates
+// though allEnemies array containing the Enemy objects
+// Param 'dt': number of seconds passed since last game tick
+// Param 'index': Enemy position in array
+Enemy.prototype.update = function(dt,index) {
+    // Check if Enemy X position less than canvas width
+    // True: increase position by number of pixels defined by multiplying Enemy speed by dt parameter
+    // False: remove Enemy from array and add new Enemy object to the end of allEnemies array
     if (this.x < 505) {
-
-        //var velocity = this.speed * dt;
         this.x += this.speed * dt;
     } else {
-        this.resetEnemy();
+        //console.log(allEnemies.splice(index,1));
+        //console.log(allEnemies);
+        enemy = new Enemy();
+        allEnemies.push(enemy);
+        //console.log(allEnemies);
     }
-    // handle collision
-
-
 };
 
-Enemy.prototype.resetEnemy = function() {
-    var yCoordinates = [63, 146, 229, 312];
-    this.x = -201;
-    /* Sef-invoking function randomly selects Y coordinates for enemy objects
-     */
-    this.y = (function() {
-        var choice = Math.floor(Math.random() * yCoordinates.length);
-        return yCoordinates[choice];
-    })();
-    this.speed = Math.ceil((Math.random()) * 400) + 100;
 
-};
+// Enemy.prototype.resetEnemy = function() {
+//     var yCoordinates = [63, 146, 229, 312];
+//     this.x = -201;
+//     // Sef-invoking function randomly selects Y coordinates for enemy objects
+//     this.y = (function() {
+//         var choice = Math.floor(Math.random() * yCoordinates.length);
+//         return yCoordinates[choice];
+//     })();
+//     this.speed = Math.ceil((Math.random()) * 400) + 100;
+//
+// };
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -77,8 +85,6 @@ Player.prototype.update = function() {
         this.scoreCount += 10;
         this.resetPlayer();
     }
-
-
 };
 
 Player.prototype.resetPlayer = function() {
@@ -87,7 +93,10 @@ Player.prototype.resetPlayer = function() {
 };
 
 Player.prototype.render = function() {
+    // Draw Player's image. This method invoked by renderEntities() on each game tick,
+    // and by resetPlayerMenu() at the beginning of the game.
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    // Clear old score and render new score incremented by 10 points
     ctx.clearRect(380, -5, 125, 55);
     ctx.fillStyle = "#000000";
     ctx.font = "20px Arial";
@@ -95,6 +104,21 @@ Player.prototype.render = function() {
     ctx.fillText(text, 380, 30);
 };
 
+
+
+// Player.prototype.handleInput = function(key) {
+//     if (this.y > -20 && this.y < 395 && this.x > -100.5 && this.x < 505.5) {
+//         switch (key) {
+//             case "left": this.x -= 101; break;
+//             case "up": this.y -= 83; break;
+//             case "right": this.x += 101; break;
+//             case "down": this.y += 83; break;
+//         }
+//     }
+// };
+
+
+// Receive user input (key which was pressed) and move the player according to that input
 Player.prototype.handleInput = function(key) {
     if (key === "left" && this.x > 0.5) {
         this.x -= 101;
@@ -113,21 +137,7 @@ Player.prototype.handleInput = function(key) {
 
 
 
-// function spawnPlayer(x) {
-//     for (var i = 0, len = allPlayers.length; i < len; i++) {
-//         if (allPlayers[i].x = x) {
-//             player = new Player(allPlayers[i].sprite, 202.5);
-//         }
-//     }
-//
-//}
 
-var playerCatGirl = new Player('images/char-cat-girl.png', 0.5, 229);
-var playerHornGirl = new Player('images/char-horn-girl.png', 101.5, 229);
-var playerBoy = new Player('images/char-boy.png', 202.5, 229);
-var playerPinkGirl = new Player('images/char-pink-girl.png', 303.5, 229);
-var playerPrincess = new Player('images/char-princess-girl.png', 404.5, 229);
-allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
 
 selector = {
     'image': 'images/Selector.png',
@@ -144,60 +154,19 @@ selector = {
             this.x += 101;
         } else if (key === 'enter') {
             this.tester = 1;
-            for (var i = 0; i < allPlayers.length; i++) {
-                if (allPlayers[i].x === this.x) {
-                    player = new Player(allPlayers[i].sprite);
-                   player.resetPlayer();
-
-                }
+            switch (this.x) {
+                case 0.5: player = new Player('images/char-cat-girl.png'); break;
+                case 101.5: player = new Player('images/char-horn-girl.png'); break;
+                case 202.5: player = new Player('images/char-boy.png'); break;
+                case 303.5: player = new Player('images/char-pink-girl.png'); break;
+                case 404.5: player = new Player('images/char-princess-girl.png'); break;
             }
-            allPlayers = [];
+            player.resetPlayer();
             this.x = 202.5;
-            //spawnPlayer(this.x);
-
-            // if (this.x === 0.5) {
-            //     player.sprite = allPlayers[0].sprite;
-            //     player.resetPlayer();
-            //     main();
-            // } else if (this.x === 101.5) {
-            //     player.sprite = allPlayers[1].sprite;
-            //     player.resetPlayer();
-            // } else if (this.x === 202.5) {
-            //     player.sprite = allPlayers[2].sprite;
-            //     player.resetPlayer();
-            // } else if (this.x === 303.5) {
-            //     player.sprite = allPlayers[3].sprite;
-            //     player.resetPlayer();
-            // } else {
-            //     player.sprite = allPlayers[4].sprite;
-            //     player.resetPlayer();
-            // }
-            // switch(this.x) {
-            //     case(0.5):
-            //         player.sprite = allPlayers[0].sprite;
-            //         player.resetPlayer();
-            //     break;
-            //     case(101.5): player.sprite = allPlayers[1].sprite; break;
-            //     case(202.5):
-            //         player.sprite = allPlayers[2].sprite;
-            //         player.resetPlayer();
-            //         break;
-            //     case(303.5): player.sprite = allPlayers[3].sprite; break;
-            //     case(404.5): player.sprite = allPlayers[4].sprite; break;
-            //     default:
-            // }
         }
     }
 };
 
-// document.addEventListener('keyup', function(e) {
-//     var allowedKeys = {
-//         37: 'left',
-//         39: 'right',
-//         13: 'enter'
-//     };
-//     selector.handlePlayerSelection(allowedKeys[e.keyCode]);
-// });
 
 function spawnEnemies() {
     for (var i = 0; i < 4; i++) {
@@ -215,7 +184,7 @@ hearts = {
     imageHeight: 65,
     heartCount: 3,
     renderHearts: function(count) {
-        /* Loop through the number of hearts passed as parameter to draw Heart images
+        /* Loop through the number of hearts passed as parameter and draw Heart images
          * with defined width and height
          */
         for (var i = 0; i < count; i++) {
@@ -224,21 +193,11 @@ hearts = {
     }
 };
 
-score = {
-    scoreCount: "",
-    renderScore: function() {
-        ctx.fillStyle = "#000000";
-        ctx.font = "20px Arial";
-        var text = "Score: " + scoreCount;
-        ctx.fillText(text, 5, 30);
-    }
-
-};
 
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
+document.addEventListener('keydown', function(e) {
     var allowedKeys = {
         37: 'left',
         38: 'up',

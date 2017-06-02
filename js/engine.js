@@ -98,8 +98,9 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        allEnemies.forEach(function(enemy) {
-            enemy.update(dt);
+        allEnemies.forEach(function(enemy,i) {
+            //console.log("This is index " + i);
+            enemy.update(dt,i);
         });
         //ctx.clearRect(0, -5, 505, 55);
         player.update();
@@ -167,6 +168,47 @@ var Engine = (function(global) {
         }
     }
 
+    function renderPlayerSelection() {
+        var rowImages = [
+                'images/char-cat-girl.png',
+                'images/char-horn-girl.png',
+                'images/char-boy.png',
+                'images/char-pink-girl.png',
+                'images/char-princess-girl.png'
+            ],
+            numCols = 5,
+            x = -100.5,
+            col;
+
+        /* Loop through the number of rows and columns we've defined above
+         * and, using the rowImages array, draw the correct image for that
+         * portion of the "grid"
+         */
+
+        function f() {
+            for (col = 0; col < numCols; col++) {
+                x += 101;
+                ctx.drawImage(Resources.get(rowImages[col]), x, 229);
+            }
+        }
+
+
+        // for (col = 0; col < numCols; col++) {
+        //     x = 0;
+        //     /* The drawImage function of the canvas' context element
+        //      * requires 3 parameters: the image to draw, the x coordinate
+        //      * to start drawing and the y coordinate to start drawing.
+        //      * We're using our Resources helpers to refer to our images
+        //      * so that we get the benefits of caching these images, since
+        //      * we're using them over and over.
+        //      */
+        //     ctx.drawImage(Resources.get(rowImages[col]), x, 229);
+        //
+        // }
+        return f();
+
+    }
+
 
 
     /* This function is called by the render function and is called on each game
@@ -193,8 +235,10 @@ var Engine = (function(global) {
     */
     function reset() {
         selector.tester = 0;
-        allPlayers = [];
-        allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
+        // Delete all elements from array
+        //allPlayers.length = 0;
+        //player = {};
+        //allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
         allEnemies = [];
         spawnEnemies();
         hearts.heartCount = 3;
@@ -203,9 +247,7 @@ var Engine = (function(global) {
     function resetPlayerMenu() {
         renderBlocks();
         selector.render();
-        allPlayers.forEach(function(player) {
-            player.render();
-        });
+        renderPlayerSelection();
         ctx.clearRect(0, -5, 505, 55);
 
         //ctx.strokeStyle = "#000000";
