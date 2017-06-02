@@ -1,5 +1,6 @@
 // App.js
-// This file defines the game entities and their methods.
+// This file defines the Enemy and Player classes.
+// game entities and their methods.
 //
 // a player, random collectible items, and enemies
 // to avoid.  It also controls game settings and
@@ -11,8 +12,9 @@ var enemy,
     selector,
     hearts;
 
-// Enemy constructor
+// Enemy constructor initializes
 var Enemy = function() {
+    this.sprite = 'images/enemy-bug.png';
     this.x = -201;
     this.y = (function() {
         var yCoordinates = [63, 146, 229, 312];
@@ -23,50 +25,33 @@ var Enemy = function() {
         }
         return f();
     })();
-    this.sprite = 'images/enemy-bug.png';
+    // Sef-invoking function randomly selects Y coordinates for enemy objects
     this.speed = (function() {
         return Math.ceil(Math.random() * 400 + 100);
     })()
 };
 
-// Update the Enemy position
-// Invoked by a function in forEach method that iterates
-// though allEnemies array containing the Enemy objects
-// Param 'dt': number of seconds passed since last game tick
-// Param 'index': Enemy position in array
+// Update the Enemy position by changing x, y, and speed property values.
+// Invoked by a function in forEach method nested within updateEntities().
+// Param 'dt': number of seconds passed since last game tick.
+// Param 'index': Enemy position in array.
 Enemy.prototype.update = function(dt,index) {
-    // Check if Enemy X position less than canvas width
-    // True: increase position by number of pixels defined by multiplying Enemy speed by dt parameter
-    // False: remove Enemy from array and add new Enemy object to the end of allEnemies array
+    // Check if Enemy X position less than canvas width.
+    // True: increase position by number of pixels defined by multiplying Enemy speed by dt parameter.
+    // False: replace current Enemy object in the allEnemies array with a new Enemy object.
+    // This ensures the Enemy objects are assigned new x, y, and speed property values
+    // each time the Enemy reappears on the screen.
     if (this.x < 505) {
         this.x += this.speed * dt;
     } else {
-        //console.log(allEnemies.splice(index,1));
-        //console.log(allEnemies);
-        enemy = new Enemy();
-        allEnemies.push(enemy);
-        //console.log(allEnemies);
+        allEnemies.splice(index, 1, new Enemy);
     }
 };
 
-
-// Enemy.prototype.resetEnemy = function() {
-//     var yCoordinates = [63, 146, 229, 312];
-//     this.x = -201;
-//     // Sef-invoking function randomly selects Y coordinates for enemy objects
-//     this.y = (function() {
-//         var choice = Math.floor(Math.random() * yCoordinates.length);
-//         return yCoordinates[choice];
-//     })();
-//     this.speed = Math.ceil((Math.random()) * 400) + 100;
-//
-// };
-
-// Draw the enemy on the screen, required method for game
+// Draw the Enemy on the screen
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
-
 
 
 // Now write your own player class
@@ -74,9 +59,9 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function(url,x,y) {
+    this.sprite = url;
     this.x = x;
     this.y = y;
-    this.sprite = url;
     this.scoreCount = 0;
 };
 
@@ -92,9 +77,9 @@ Player.prototype.resetPlayer = function() {
     this.y = 395;
 };
 
+// Draw Player and score images. This method invoked by renderEntities() on each game tick,
+// and by resetPlayerMenu() at the beginning of the game.
 Player.prototype.render = function() {
-    // Draw Player's image. This method invoked by renderEntities() on each game tick,
-    // and by resetPlayerMenu() at the beginning of the game.
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     // Clear old score and render new score incremented by 10 points
     ctx.clearRect(380, -5, 125, 55);
@@ -168,20 +153,14 @@ selector = {
 };
 
 
-function spawnEnemies() {
-    for (var i = 0; i < 4; i++) {
-        enemy = new Enemy();
-        allEnemies.push(enemy);
-    }
-}
-
-
+// This creates object which properties are used to draw hearts/lives for the Player
 hearts = {
     x: 101,
     y: -5,
     sprite: 'images/Heart.png',
     imageWidth: 45,
     imageHeight: 65,
+    // limits Player number of lives to 3
     heartCount: 3,
     renderHearts: function(count) {
         /* Loop through the number of hearts passed as parameter and draw Heart images
@@ -192,7 +171,6 @@ hearts = {
         }
     }
 };
-
 
 
 // This listens for key presses and sends the keys to your
@@ -208,3 +186,10 @@ document.addEventListener('keydown', function(e) {
     selector.handlePlayerSelection(allowedKeys[e.keyCode]);
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+function spawnEnemies() {
+    for (var i = 0; i < 4; i++) {
+        enemy = new Enemy;
+        allEnemies.push(enemy);
+    }
+}

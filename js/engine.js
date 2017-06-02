@@ -42,18 +42,18 @@ var Engine = (function(global) {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        if (selector.tester === 0) {
+        /* This is the stop point before the game starts.
+         * Check if Player has been selected: tester = 0 = Player is not selected => call resetPlayer().
+         */
+        if (!selector.tester) {
             resetPlayerMenu();
         } else {
-            /* Call our update/render functions, pass along the time delta to
+            /* tester = 1 = Player is selected => call update and render functions, pass along the time delta to
              * our update function since it may be used for smooth animation.
              */
-
             update(dt);
             render();
         }
-
-
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -65,25 +65,20 @@ var Engine = (function(global) {
         win.requestAnimationFrame(main);
     }
 
-    /* This function does some initial setup that should only occur once,
-     * particularly setting the lastTime variable that is required for the
-     * game loop.
+    /* This function sets the lastTime variable that is required for the game loop,
+     * then invokes reset and main functions to prepare canvas for a new game.
+     * First time it gets invoked when all the images are loaded and cashed.
+     * Then we call it each time Player looses.
+     * It can also be manually invoked at any time by pressing 'New Game' button on the page.
      */
     function init() {
-
-        reset();
         lastTime = Date.now();
+        reset();
         main();
     }
 
-    /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. Based on how
-     * you implement your collision detection (when two entities occupy the
-     * same space, for instance when your character should die), you may find
-     * the need to add an additional function call here. For now, we've left
-     * it commented out - you may or may not want to implement this
-     * functionality this way (you could just implement collision detection
-     * on the entities themselves within your app.js file).
+    /* This function is called by main (our game loop) and itself calls
+     * updateEntities() and checkCollisions().
      */
     function update(dt) {
         updateEntities(dt);
@@ -91,9 +86,11 @@ var Engine = (function(global) {
     }
 
     /* This is called by the update function and loops through all of the
-     * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
-     * player object. These update methods should focus purely on updating
+     * objects within the allEnemies array and calls
+     * their update() methods. It then calls the update function for the Player object.
+      *
+      *
+      * These update methods should focus purely on updating
      * the data/properties related to the object. Do your drawing in your
      * render methods.
      */
@@ -107,10 +104,14 @@ var Engine = (function(global) {
     }
 
     function checkCollisions() {
+
+        if (hearts.heartCount = 1) init();
+
         allEnemies.forEach(function(enemy) {
             if (enemy.y === player.y && enemy.x - 50 < player.x && enemy.x + 75 > player.x) {
-                if(hearts.heartCount > 0) {
+                if(hearts.heartCount > 1) {
                     player.resetPlayer();
+                    // decrement heartCount value by 1
                     hearts.heartCount -= 1;
                     ctx.clearRect(0, -5, 145, 55);
                 } else {
@@ -229,19 +230,17 @@ var Engine = (function(global) {
 
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
+    /* This function is called by init() every time the game is reset.
+     * It changes selector tester property value back to '0' since it gets set to '1' when Player is selected.
+     * It updates heartCount to give Player 3 lives.
+     * It deletes all elements of the allEnemies array and calls spawnEnemies() to populate that
+     * array with new Enemy objects.
     */
     function reset() {
         selector.tester = 0;
-        // Delete all elements from array
-        //allPlayers.length = 0;
-        //player = {};
-        //allPlayers.push(playerCatGirl,playerHornGirl,playerBoy,playerPinkGirl,playerPrincess);
-        allEnemies = [];
-        spawnEnemies();
         hearts.heartCount = 3;
+        allEnemies.length = 0;
+        spawnEnemies();
     }
 
     function resetPlayerMenu() {
