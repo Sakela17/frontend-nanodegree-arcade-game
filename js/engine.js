@@ -43,13 +43,13 @@ var Engine = (function(global) {
             dt = (now - lastTime) / 1000.0;
 
         /* This is the stop point before the game starts.
-         * Check if Player has been selected: tester = 0 = Player is not selected => call resetPlayer().
+         * Check if character is selected: tester = 0 = not selected => call resetPlayerMenu().
          */
         if (!selector.tester) {
             resetPlayerMenu();
         } else {
-            /* tester = 1 = Player is selected => call update and render functions, pass along the time delta to
-             * our update function since it may be used for smooth animation.
+            /* tester = 1 = character is selected => call update and render functions, pass along
+             * the time delta to update function since it may be used for smooth animation.
              */
             update(dt);
             render();
@@ -69,7 +69,7 @@ var Engine = (function(global) {
      * then invokes reset and main functions to prepare canvas for a new game.
      * First time it gets invoked when all the images are loaded and cashed.
      * Then we call it each time Player looses.
-     * It can also be manually invoked at any time by pressing 'New Game' button on the page.
+     * It can also be invoked at any time by pressing 'New Game' button on the page.
      */
     function init() {
         lastTime = Date.now();
@@ -82,47 +82,22 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        checkCollisions();
+        /* Call init() if Player loses (has no lives/hearts left).
+         */
+        if (!player.heartCount) init();
     }
 
     /* This is called by the update function and loops through all of the
      * objects within the allEnemies array and calls
-     * their update() methods. It then calls the update function for the Player object.
-      *
-      *
-      * These update methods should focus purely on updating
-     * the data/properties related to the object. Do your drawing in your
-     * render methods.
+     * their update() method. It then calls the update function for the Player object.
      */
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy,i) {
-            //console.log("This is index " + i);
+            /* i argument is index position of Enemy object in array. */
             enemy.update(dt,i);
         });
-        //ctx.clearRect(0, -5, 505, 55);
         player.update();
     }
-
-    function checkCollisions() {
-
-        if (hearts.heartCount = 1) init();
-
-        allEnemies.forEach(function(enemy) {
-            if (enemy.y === player.y && enemy.x - 50 < player.x && enemy.x + 75 > player.x) {
-                if(hearts.heartCount > 1) {
-                    player.resetPlayer();
-                    // decrement heartCount value by 1
-                    hearts.heartCount -= 1;
-                    ctx.clearRect(0, -5, 145, 55);
-                } else {
-                    init();
-                }
-            }
-
-        });
-    }
-
-
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -131,10 +106,8 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
-
         renderBlocks();
         ctx.clearRect(0, -5, 505, 55);
-        hearts.renderHearts(hearts.heartCount);
         renderEntities();
     }
 
@@ -185,60 +158,38 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-
         function f() {
             for (col = 0; col < numCols; col++) {
                 x += 101;
                 ctx.drawImage(Resources.get(rowImages[col]), x, 229);
             }
         }
-
-
-        // for (col = 0; col < numCols; col++) {
-        //     x = 0;
-        //     /* The drawImage function of the canvas' context element
-        //      * requires 3 parameters: the image to draw, the x coordinate
-        //      * to start drawing and the y coordinate to start drawing.
-        //      * We're using our Resources helpers to refer to our images
-        //      * so that we get the benefits of caching these images, since
-        //      * we're using them over and over.
-        //      */
-        //     ctx.drawImage(Resources.get(rowImages[col]), x, 229);
-        //
-        // }
         return f();
-
     }
-
-
 
     /* This function is called by the render function and is called on each game
      * tick. Its purpose is to then call the render functions you have defined
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
         player.render();
-
-
     }
 
     /* This function is called by init() every time the game is reset.
      * It changes selector tester property value back to '0' since it gets set to '1' when Player is selected.
-     * It updates heartCount to give Player 3 lives.
+     * It resets selector x coordinates back to initial location.
      * It deletes all elements of the allEnemies array and calls spawnEnemies() to populate that
      * array with new Enemy objects.
     */
     function reset() {
         selector.tester = 0;
-        hearts.heartCount = 3;
+        selector.x = 202.5;
         allEnemies.length = 0;
         spawnEnemies();
     }
@@ -248,17 +199,11 @@ var Engine = (function(global) {
         selector.render();
         renderPlayerSelection();
         ctx.clearRect(0, -5, 505, 55);
-
-        //ctx.strokeStyle = "#000000";
-        //ctx.strokeText("Use arrows to choose a player. When ready, hit enter.", 100, 200);
         ctx.fillStyle = "#000000";
         ctx.font = "20px Arial";
         var text = "Use arrows to choose a player. When ready, click enter.";
         ctx.fillText(text, 5, 30);
-
     }
-
-
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when

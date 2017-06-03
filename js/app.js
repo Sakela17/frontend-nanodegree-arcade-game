@@ -1,46 +1,50 @@
 // App.js
-// This file defines the Enemy and Player classes.
-// game entities and their methods.
-//
-// a player, random collectible items, and enemies
-// to avoid.  It also controls game settings and
-// player movement.
+// This file defines the Enemy and Player classes and their methods.
+// Selector object is implemented to add player selection functionality. It instantiate new Player
+// object each time user selects a sprite shown on a game board before starting the game.
+// Score count is implemented and set as a property of Player instance. It will increase each time
+// Player reaches the water. It's displayed as text+number format at the top right corner above the board game.
+// Number of lives that user has left is implemented and set as a property of Player instance. It will
+// decrease each time the Player has a collision with the Enemy. It's displayed as heart
+// images at the top left corner above the board game.
 
-var allEnemies = [];
+
+// Declare global variables that will be used in app.js and engine.js scopes.
 var enemy,
     player,
-    selector,
-    hearts;
+    selector;
 
-// Enemy constructor initializes
+// Create empty array.
+var allEnemies = [];
+
+// Enemy constructor initializes properties of the Enemy instances.
 var Enemy = function() {
     this.sprite = 'images/enemy-bug.png';
     this.x = -201;
+    // Sef-invoking function randomly sets Y coordinates.
     this.y = (function() {
         var yCoordinates = [63, 146, 229, 312];
-        // Sef-invoking function randomly selects Y coordinates for enemy objects
         function f() {
             var choice = Math.floor(Math.random() * yCoordinates.length);
             return yCoordinates[choice];
         }
         return f();
     })();
-    // Sef-invoking function randomly selects Y coordinates for enemy objects
+    // Sef-invoking function calculates random speeds.
     this.speed = (function() {
         return Math.ceil(Math.random() * 400 + 100);
     })()
 };
 
-// Update the Enemy position by changing x, y, and speed property values.
+// Update the Enemy position.
 // Invoked by a function in forEach method nested within updateEntities().
 // Param 'dt': number of seconds passed since last game tick.
-// Param 'index': Enemy position in array.
+// Param 'index': index position of Enemy object in array.
 Enemy.prototype.update = function(dt,index) {
-    // Check if Enemy X position less than canvas width.
-    // True: increase position by number of pixels defined by multiplying Enemy speed by dt parameter.
+    // Check if Enemy X coordinate less than canvas width.
+    // True: increase X coordinate by number of pixels defined by multiplying Enemy speed by dt parameter.
     // False: replace current Enemy object in the allEnemies array with a new Enemy object.
-    // This ensures the Enemy objects are assigned new x, y, and speed property values
-    // each time the Enemy reappears on the screen.
+    // This ensures that x, y, and speed properties change each time the Enemy reappears on the screen.
     if (this.x < 505) {
         this.x += this.speed * dt;
     } else {
@@ -48,62 +52,63 @@ Enemy.prototype.update = function(dt,index) {
     }
 };
 
-// Draw the Enemy on the screen
+// Draw Enemy on the canvas
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
-var Player = function(url,x,y) {
+// Player constructor initializes properties of the Player instances.
+var Player = function(url) {
     this.sprite = url;
-    this.x = x;
-    this.y = y;
+    this.x = 202.5;
+    this.y = 395;
     this.scoreCount = 0;
+    // limit Player number of lives to 3
+    this.heartCount = 3;
 };
 
+// This method updates Player score and checks for collision.
 Player.prototype.update = function() {
+    // When Player reaches the water, increase score by 10 points and move Player to the initial location.
     if (this.y === -20) {
         this.scoreCount += 10;
         this.resetPlayer();
     }
+
+    // When collision with Enemy occurs, decrement life count by 1, clear canvas, move Player to the initial location.
+    allEnemies.forEach(function(enemy) {
+        if (enemy.y === player.y && enemy.x - 50 < player.x && enemy.x + 75 > player.x) {
+            player.heartCount -= 1;
+            ctx.clearRect(0, -5, 145, 55);
+            player.resetPlayer();
+        }
+    });
 };
 
+// Move Player to the initial location. Invoked when Player reaches the water or encounters Enemy.
 Player.prototype.resetPlayer = function() {
     this.x = 202.5;
     this.y = 395;
 };
 
-// Draw Player and score images. This method invoked by renderEntities() on each game tick,
-// and by resetPlayerMenu() at the beginning of the game.
+// Draw Player, score and heart images. This method invoked by renderEntities() on each game tick.
 Player.prototype.render = function() {
+    // Draw Player image.
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    // Clear old score and render new score incremented by 10 points
+    // Clear then draw text that shows score count.
     ctx.clearRect(380, -5, 125, 55);
     ctx.fillStyle = "#000000";
     ctx.font = "20px Arial";
     var text = "Score: " + this.scoreCount;
     ctx.fillText(text, 380, 30);
+    // Loop through the number of hearts and draw Heart images
+    for (var i = 0; i < this.heartCount; i++) {
+        ctx.drawImage(Resources.get('images/Heart.png'), i * 101 / 2, -5, 45, 65);
+    }
 };
 
-
-
-// Player.prototype.handleInput = function(key) {
-//     if (this.y > -20 && this.y < 395 && this.x > -100.5 && this.x < 505.5) {
-//         switch (key) {
-//             case "left": this.x -= 101; break;
-//             case "up": this.y -= 83; break;
-//             case "right": this.x += 101; break;
-//             case "down": this.y += 83; break;
-//         }
-//     }
-// };
-
-
-// Receive user input (key which was pressed) and move the player according to that input
+// Receive values from allowedKeys object based on user input (keys which were pressed)
+// and position Player according to that input making sure Player cannot move off screen.
 Player.prototype.handleInput = function(key) {
     if (key === "left" && this.x > 0.5) {
         this.x -= 101;
@@ -116,29 +121,28 @@ Player.prototype.handleInput = function(key) {
     }
 };
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-
-
-
-
-
+// This object created for implementation of character selection.
 selector = {
     'image': 'images/Selector.png',
     'x': 202.5,
     'y': 209,
+    // This property acts as on/off switch. While '0', means user did not make character
+    // selection and resetPlayerMenu() is called on each tick.
     'tester': 0,
+    // Draw selector image.
     'render': function() {
         ctx.drawImage(Resources.get(this.image), this.x, this.y);
     },
+    // Receive values from allowedKeys object based on user input (keys which were pressed)
+    // and position Player according to that input. Handle only left/right and enter values.
     'handlePlayerSelection': function(key) {
         if (key === 'left' && this.x > 0.5) {
             this.x -= 101;
         } else if (key === 'right' && this.x < 404.5) {
             this.x += 101;
         } else if (key === 'enter') {
-            this.tester = 1;
+            // When image is selected, create new Player and pass that image as an argument.
+            // Update selector.tester to 1.
             switch (this.x) {
                 case 0.5: player = new Player('images/char-cat-girl.png'); break;
                 case 101.5: player = new Player('images/char-horn-girl.png'); break;
@@ -146,35 +150,13 @@ selector = {
                 case 303.5: player = new Player('images/char-pink-girl.png'); break;
                 case 404.5: player = new Player('images/char-princess-girl.png'); break;
             }
-            player.resetPlayer();
-            this.x = 202.5;
+            this.tester = 1;
         }
     }
 };
-
-
-// This creates object which properties are used to draw hearts/lives for the Player
-hearts = {
-    x: 101,
-    y: -5,
-    sprite: 'images/Heart.png',
-    imageWidth: 45,
-    imageHeight: 65,
-    // limits Player number of lives to 3
-    heartCount: 3,
-    renderHearts: function(count) {
-        /* Loop through the number of hearts passed as parameter and draw Heart images
-         * with defined width and height
-         */
-        for (var i = 0; i < count; i++) {
-            ctx.drawImage(Resources.get(this.sprite), i * this.x / 2, this.y, this.imageWidth, this.imageHeight);
-        }
-    }
-};
-
 
 // This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// player.handleInput() and selector.handlePlayerSelection() methods.
 document.addEventListener('keydown', function(e) {
     var allowedKeys = {
         37: 'left',
@@ -187,6 +169,8 @@ document.addEventListener('keydown', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
+// Instantiate 4 Enemies and place them in allEnemies array. Invoked at the beginning of
+// each new game by reset().
 function spawnEnemies() {
     for (var i = 0; i < 4; i++) {
         enemy = new Enemy;
