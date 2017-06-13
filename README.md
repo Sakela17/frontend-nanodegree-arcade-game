@@ -7,7 +7,7 @@ Using provided art assets and the game engine, I built my version of a classic F
 
 #### Playing the game
 The goal is simple, get a hero character to move across the gray bricks towards the water without getting hit by the swiftly moving enemy bugs. Each time a character reaches the water, the score increases by ten points and the character is reset back to the starting position. A player wins and the game is ended after 100 points are accumulated.
-A player is given 3 spare lives that are displayed in the upper left corner as red hearts. A heart is removed when a hero character collides with an enemy bug. Player loses and the game gets reset when no hearts are left.
+A player is given 3 spare lives that are displayed in the upper left corner as red hearts. A heart is removed when a hero character collides with an enemy bug. When no hearts are left, Player loses and the game is reset.
 
 #### Movement and Controls
 Navigate a hero character by using the main up/right/left/down arrow keys on the keyboard.
