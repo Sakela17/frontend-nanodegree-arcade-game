@@ -42,7 +42,7 @@ var Engine = (function(global) {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        /* This is the stop point before the game starts.
+        /* This is the stop point where user gets to choose a sprite for its player.
          * Check if character is selected: tester = 0 = not selected => call resetPlayerMenu().
          */
         if (!selector.tester) {
@@ -59,6 +59,7 @@ var Engine = (function(global) {
          * for the next time this function is called.
          */
         lastTime = now;
+
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
@@ -84,7 +85,9 @@ var Engine = (function(global) {
         updateEntities(dt);
         /* Call init() if Player loses (has no lives/hearts left).
          */
-        if (!player.heartCount) init();
+        if (!player.heartCount || player.scoreCount === 100) {
+            init();
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -107,10 +110,12 @@ var Engine = (function(global) {
      */
     function render() {
         renderBlocks();
+        /* Clear Hearts and Score to prevent overlapping */
         ctx.clearRect(0, -5, 505, 55);
         renderEntities();
     }
 
+    /* This function is called by render() to draw the images of the game "grid". */
     function renderBlocks() {
         var rowImages = [
                 'images/water-block.png',   // Top row is water
@@ -128,8 +133,8 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
+        for (row = 0; row < numRows; row += 1) {
+            for (col = 0; col < numCols; col += 1) {
                 /* The drawImage function of the canvas' context element
                  * requires 3 parameters: the image to draw, the x coordinate
                  * to start drawing and the y coordinate to start drawing.
@@ -142,6 +147,9 @@ var Engine = (function(global) {
         }
     }
 
+    /* This function gets invoked by resetPlayerMenu(). It's purpose to draw
+     * 5 sprite images for user to choose from before starting the game.
+     */
     function renderPlayerSelection() {
         var rowImages = [
                 'images/char-cat-girl.png',
@@ -154,12 +162,11 @@ var Engine = (function(global) {
             x = -100.5,
             col;
 
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
+        /* Loop through the number of columns we've defined above and,
+         * using the rowImages array, draw images for that portion of the "grid".
          */
         function f() {
-            for (col = 0; col < numCols; col++) {
+            for (col = 0; col < numCols; col += 1) {
                 x += 101;
                 ctx.drawImage(Resources.get(rowImages[col]), x, 229);
             }
@@ -168,8 +175,8 @@ var Engine = (function(global) {
     }
 
     /* This function is called by the render function and is called on each game
-     * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
+     * tick. Its purpose is to then call the render functions defined
+     * on the enemy and player entities within app.js.
      */
     function renderEntities() {
         /* Loop through all of the objects within the allEnemies array and call
@@ -194,15 +201,40 @@ var Engine = (function(global) {
         spawnEnemies();
     }
 
+    /* This function sets the canvas for the game by calling renderBlocks(),
+     * selector.render(), renderPlayerSelection(), and drawing .
+     * It is invoked by main() function at the begging of a new game.
+     */
     function resetPlayerMenu() {
+        var text = "Use arrows to choose a player. When ready, click enter.";
+
+        /* Draw grass, stones, and water images on the canvas. */
         renderBlocks();
-        selector.render();
-        renderPlayerSelection();
+
+        /* Begin drawing 'Game Over' and score results after the first round had been played
+         * and before starting the game.
+         */
+        ctx.textAlign = "center";
+        if (player.scoreCount > 0 || !player.heartCount) {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.fillRect(1, 1, 545, 585);
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "white";
+            ctx.fillText("GAME OVER", 252.5, 150);
+            ctx.fillText("Your score is " + player.scoreCount, 252.5, 200);
+        }
+
+        /* Replace Heart images and score text with menu text */
         ctx.clearRect(0, -5, 505, 55);
         ctx.fillStyle = "#000000";
         ctx.font = "20px Arial";
-        var text = "Use arrows to choose a player. When ready, click enter.";
-        ctx.fillText(text, 5, 30);
+        ctx.fillText(text, 252.5, 30);
+
+        /* Draw selector image on the canvas. */
+        selector.render();
+
+        /* Draw character images on the canvas. */
+        renderPlayerSelection();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -220,8 +252,8 @@ var Engine = (function(global) {
         'images/char-pink-girl.png',
         'images/char-princess-girl.png',
         'images/Selector.png',
-        'images/Heart.png'
-
+        'images/Heart.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 
