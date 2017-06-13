@@ -6,15 +6,10 @@ Using provided art assets and the game engine, I built my version of a classic F
 <img src="images/game_screenshot.png" alt="game screenshot" width="50%">
 
 #### Playing the game
-The goal is simple, get a hero character to move across the gray bricks towards the water without getting hit by the swiftly moving enemy bugs. Each time a character reaches the water, the score increases by ten points and the character is reset back to the starting position. A player wins and the game is ended after 100 points are accumulated.
-A player is given 3 spare lives that are displayed in the upper left corner as red hearts. A heart is removed when a hero character collides with an enemy bug. When no hearts are left, Player loses and the game is reset.
+The goal is simple, get a hero character to move across the gray bricks towards the water without getting hit by the swiftly moving enemy bugs. Each time a character reaches the water, the score increases by ten points and the character is reset back to the starting position.
+A player is given 3 spare lives that are displayed in the upper left corner as red hearts. A heart is removed when a hero character collides with an enemy bug. When no hearts are left, Player loses and the game is reset. The goal is to accumulate 100 points before running out of hearts.
 
 #### Movement and Controls
 Navigate a hero character by using the main up/right/left/down arrow keys on the keyboard.
 
-## Installation
-To run the application:
-1. Download the GitHub zip file or clone the repository onto your local workstation:
-    * zip file https://github.com/Sakela17/frontend-nanodegree-arcade-game/archive/master.zip
-    * git clone https://github.com/Sakela17/frontend-nanodegree-arcade-game.git
-2. Open a browser window and navigate to the index.html file in your application's directory.
+#### [PLAY GAME](https://sakela17.github.io/frontend-nanodegree-arcade-game/)
