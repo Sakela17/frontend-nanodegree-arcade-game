@@ -3,7 +3,8 @@
 ## Summary
 This is one of the projects for the Front-End Web Developer Nanodegree program at [Udacity](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001).
 Using provided art assets and the game engine, I built my version of a classic Frogger arcade game where a player needs to navigate a character to the top of the screen while avoiding a collision with an enemy.
-<img src="images/game_screenshot.png" alt="game screenshot">
+
+<img src="images/game_screenshot.png" alt="game screenshot" width="50%">
 
 #### Playing the game
 The goal is simple, get a hero character to move across the gray bricks towards the water without getting hit by the swiftly moving enemy bugs. Each time a character reaches the water, the score increases by ten points and the character is reset back to the starting position. A player wins and the game is ended after 100 points are accumulated.
