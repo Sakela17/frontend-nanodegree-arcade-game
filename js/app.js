@@ -35,12 +35,15 @@ function Enemy() {
 Enemy.prototype.update = function(dt,index) {
     // Check if Enemy X coordinate less than canvas width.
     // True: increase X coordinate by number of pixels defined by multiplying Enemy speed by dt parameter.
-    // False: reset x and y coordinates to the starting position.
+    // False: reset x and y coordinates to the starting position, and update speed.
     if (this.x < 505) {
         this.x += this.speed * dt;
     } else {
         allEnemies[index].x = -201;
         allEnemies[index].y = randomY();
+        allEnemies[index].speed = (function() {
+            return Math.ceil(Math.random() * 400 + 100);
+        })();
     }
 };
 
