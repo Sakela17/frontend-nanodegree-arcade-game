@@ -14,6 +14,8 @@
  * a little simpler to work with.
  */
 
+"use strict";
+
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -21,8 +23,8 @@ var Engine = (function(global) {
      */
     var doc = global.document,
         win = global.window,
-        canvas = doc.createElement('canvas'),
-        ctx = canvas.getContext('2d'),
+        canvas = doc.createElement("canvas"),
+        ctx = canvas.getContext("2d"),
         lastTime;
 
     canvas.width = 505;
@@ -42,13 +44,13 @@ var Engine = (function(global) {
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
-        /* This is the stop point where user gets to choose a sprite for its player.
-         * Check if character is selected: tester = 0 = not selected => call resetPlayerMenu().
+        /* Interrupt loop for character choice.
+         * If tester = 0 = character not selected => call resetPlayerMenu().
          */
-        if (!selector.tester) {
+        if (!player.tester) {
             resetPlayerMenu();
         } else {
-            /* tester = 1 = character is selected => call update and render functions, pass along
+            /* tester = 1 = character selected => call update and render functions, pass along
              * the time delta to update function since it may be used for smooth animation.
              */
             update(dt);
@@ -118,12 +120,12 @@ var Engine = (function(global) {
     /* This function is called by render() to draw the images of the game "grid". */
     function renderBlocks() {
         var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 4 of stone
-                'images/stone-block.png',   // Row 2 of 4 of stone
-                'images/stone-block.png',   // Row 3 of 4 of stone
-                'images/stone-block.png',   // Row 4 of 4 of stone
-                'images/grass-block.png'    // Row 1 of 1 of grass
+                "images/water-block.png",   // Top row is water
+                "images/stone-block.png",   // Row 1 of 4 of stone
+                "images/stone-block.png",   // Row 2 of 4 of stone
+                "images/stone-block.png",   // Row 3 of 4 of stone
+                "images/stone-block.png",   // Row 4 of 4 of stone
+                "images/grass-block.png"    // Row 1 of 1 of grass
             ],
             numRows = 6,
             numCols = 5,
@@ -152,11 +154,11 @@ var Engine = (function(global) {
      */
     function renderPlayerSelection() {
         var rowImages = [
-                'images/char-cat-girl.png',
-                'images/char-horn-girl.png',
-                'images/char-boy.png',
-                'images/char-pink-girl.png',
-                'images/char-princess-girl.png'
+                "images/char-cat-girl.png",
+                "images/char-horn-girl.png",
+                "images/char-boy.png",
+                "images/char-pink-girl.png",
+                "images/char-princess-girl.png"
             ],
             numCols = 5,
             x = -100.5,
@@ -195,8 +197,10 @@ var Engine = (function(global) {
      * array with new Enemy objects.
     */
     function reset() {
-        selector.tester = 0;
-        selector.x = 202.5;
+        player.sprite = "images/Selector.png";
+        player.x = 202.5;
+        player.y = 209;
+        player.tester = 0;
         allEnemies.length = 0;
         spawnEnemies();
     }
@@ -231,7 +235,7 @@ var Engine = (function(global) {
         ctx.fillText(text, 252.5, 30);
 
         /* Draw selector image on the canvas. */
-        selector.render();
+        ctx.drawImage(Resources.get(player.sprite), player.x, player.y);
 
         /* Draw character images on the canvas. */
         renderPlayerSelection();
@@ -242,18 +246,18 @@ var Engine = (function(global) {
      * all of these images are properly loaded our game will start.
      */
     Resources.load([
-        'images/stone-block.png',
-        'images/water-block.png',
-        'images/grass-block.png',
-        'images/enemy-bug.png',
-        'images/char-boy.png',
-        'images/char-cat-girl.png',
-        'images/char-horn-girl.png',
-        'images/char-pink-girl.png',
-        'images/char-princess-girl.png',
-        'images/Selector.png',
-        'images/Heart.png',
-        'images/Rock.png'
+        "images/stone-block.png",
+        "images/water-block.png",
+        "images/grass-block.png",
+        "images/enemy-bug.png",
+        "images/char-boy.png",
+        "images/char-cat-girl.png",
+        "images/char-horn-girl.png",
+        "images/char-pink-girl.png",
+        "images/char-princess-girl.png",
+        "images/Selector.png",
+        "images/Heart.png",
+        "images/Rock.png"
     ]);
     Resources.onReady(init);
 
@@ -268,5 +272,8 @@ var Engine = (function(global) {
      * from within the index.html file.
      */
     global.init = init;
+
+    // Tried this approach to see if this will fix the "button" issue (see index.html) - did not help.
+    //document.getElementById("resetButton").addEventListener("click", init);
 
 })(this);
