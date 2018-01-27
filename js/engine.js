@@ -14,9 +14,9 @@
  * a little simpler to work with.
  */
 
-"use strict";
-
 var Engine = (function(global) {
+    "use strict";
+
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -29,6 +29,7 @@ var Engine = (function(global) {
 
     canvas.width = 505;
     canvas.height = 606;
+    canvas.tabIndex = 1;
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -195,7 +196,7 @@ var Engine = (function(global) {
      * It resets selector x coordinates back to initial location.
      * It deletes all elements of the allEnemies array and calls spawnEnemies() to populate that
      * array with new Enemy objects.
-    */
+     */
     function reset() {
         player.sprite = "images/Selector.png";
         player.x = 202.5;
@@ -259,6 +260,7 @@ var Engine = (function(global) {
         "images/Heart.png",
         "images/Rock.png"
     ]);
+    console.log('resources init');
     Resources.onReady(init);
 
     /* Assign the canvas' context object to the global variable (the window
@@ -267,13 +269,13 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
 
-    /* Assign the init variable to the global variable (the window
-     * object when run in a browser) so the init function can be called
-     * from within the index.html file.
-     */
-    global.init = init;
-
-    // Tried this approach to see if this will fix the "button" issue (see index.html) - did not help.
-    //document.getElementById("resetButton").addEventListener("click", init);
+    // Unknown bug: When clicking the button, the game does not start after selecting a character.
+    // Odd behaviour: if I switch to console in dev tools then back to the game, it runs as intended.
+    var button = doc.getElementById("resetButton");
+    button.addEventListener("click", function(){
+        canvas.focus();
+        init();
+        },
+        false);
 
 })(this);

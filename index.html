@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Effective JavaScript: Frogger</title>
+    <link rel="preload" href="images/char-boy.png" as="image">
+    <link rel="preload" href="images/char-cat-girl.png" as="image">
+    <link rel="preload" href="images/char-horn-girl.png" as="image">
+    <link rel="preload" href="images/char-pink-girl.png" as="image">
+    <link rel="preload" href="images/char-princess-girl.png" as="image">
+    <link rel="preload" href="images/stone-block.png" as="image">
+    <link rel="preload" href="images/water-block.png" as="image">
+    <link rel="preload" href="images/enemy-bug.png" as="image">
+    <link rel="preload" href="images/Selector.png" as="image">
+    <link rel="preload" href="images/Heart.png" as="image">
+    <link rel="preload" href="images/Rock.png" as="image">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- When clicking the button, the game does not start after selecting a character.
-         Odd behaviour: if I switch to console in dev tools then back to the game, it runs as usual. -->
-    <button id="resetButton" onclick="init()">New Game</button>
+    <button type="button" id="resetButton" tabindex="0">New Game</button>
     <script src="js/resources.js"></script>
     <script src="js/app.js"></script>
     <script src="js/engine.js"></script>

@@ -2,6 +2,7 @@
 
 This is one of the projects for the Front-End Web Developer Nanodegree program at [Udacity](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001).
 Using provided art assets and the game engine, I built my version of a classic Frogger arcade game where a player needs to navigate a character to the top of the screen while avoiding a collision with an enemy.
+This project features newly acquired skills in Object Oriented JS and HTML5 Canvas.
 
 <img src="images/game_screenshot.png" alt="game screenshot" width="50%">
 

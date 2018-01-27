@@ -1,23 +1,27 @@
-// App.js
-// This file defines constructors for Enemy and Player objects. Constructor's prototypes
-// amended with methods that provide functionality to Enemy and Player instances.
-// Selector object implemented to add player selection feature to the game. It assigns a sprite
-// image to Player based on the user input.
-// Score count implemented and is a property of Player. It increases by 10 points each time
-// Player reaches the water. It's rendered as text+number format in the upper right hand corner above the board game.
-// Player has limited number of lives. This property defined with Player and set to 3. It
-// decreases each time Player occupies the same space with Enemy. It's rendered with heart
-// images in the upper left corner above the board game.
-//
+/* App.js
+ * This file defines constructors for Enemy and Player objects. Constructor's prototypes
+ * amended with methods that provide functionality to Enemy and Player instances.
+ * Selector object implemented to add player selection feature to the game. It assigns a sprite
+ * image to Player based on the user input.
+ * Score count implemented and is a property of Player. It increases by 10 points each time
+ * Player reaches the water. It's rendered as text+number format in the upper right hand corner above the board game.
+ * Player has limited number of lives. This property defined with Player and set to 3. It
+ * decreases each time Player occupies the same space with Enemy. It's rendered with heart
+ * (images in the upper left corner above the board game.
+ */
 
+/* jslint node: true */
+/* jshint node: true */
 "use strict";
 
-// Declare global variables that will be used in app.js and engine.js scopes.
+/* Declare global variables that will be used in app.js and engine.js scopes.
+ */
 var enemy,
     player = new Player("images/Selector.png"),
     allEnemies = [];
 
-// This Constructor initializes Enemy instances.
+/* This Constructor initializes Enemy instances.
+ */
 function Enemy() {
     this.sprite = "images/enemy-bug.png";
     this.x = -201;
@@ -28,14 +32,16 @@ function Enemy() {
     })();
 }
 
-// Update the Enemy position.
-// Invoked by a function in forEach method nested within updateEntities().
-// param dt - delta is number of seconds passed since last game tick.
-// param index - index position of Enemy object in array.
+/* Update the Enemy position.
+ * Invoked by a function in forEach method nested within updateEntities().
+ * param dt - delta is number of seconds passed since last game tick.
+ * param index - index position of Enemy object in array.
+ */
 Enemy.prototype.update = function(dt,index) {
-    // Check if Enemy X coordinate less than canvas width.
-    // True: increase X coordinate by number of pixels defined by multiplying Enemy speed by dt parameter.
-    // False: reset x and y coordinates to the starting position, and update speed.
+    /* Check if Enemy X coordinate less than canvas width.
+     * True: increase X coordinate by number of pixels defined by multiplying Enemy speed by dt parameter.
+     * False: reset x and y coordinates to the starting position, and update speed.
+     */
     if (this.x < 505) {
         this.x += this.speed * dt;
     } else {
@@ -47,13 +53,15 @@ Enemy.prototype.update = function(dt,index) {
     }
 };
 
-// Draw Enemy on the canvas
+/* Draw Enemy on the canvas
+ */
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// This Constructor initializes Player instance.
-// param url - url path for sprite images.
+/* This Constructor initializes Player instance.
+ * param url - url path for sprite images.
+ */
 function Player(url) {
     this.sprite = url;
     this.x = 202.5;
@@ -65,10 +73,9 @@ function Player(url) {
     this.tester = 0;
 }
 
-// This method updates Player score and checks for collision.
+/* This method updates Player score and checks for collision.
+ */
 Player.prototype.update = function() {
-    // Save object referenced by 'this' to var 'self' in order to use the proper 'this' in forEach function.
-    var self = this;
     // When Player reaches the water, increase score by 10 points and move Player to the initial location.
     if (this.y === -40) {
         this.scoreCount += 10;
@@ -82,17 +89,19 @@ Player.prototype.update = function() {
             ctx.clearRect(0, -5, 145, 55);
             this.resetPlayer();
         }
-    },self);
+    },this);
 };
 
-// Move Player to the initial location. Invoked at the beginning of the game when user makes a player selection,
-// and, when Player reaches the water or encounters Enemy.
+/* Move Player to the initial location. Invoked at the beginning of the game when user makes a player selection,
+ * and, when Player reaches the water or encounters Enemy.
+ */
 Player.prototype.resetPlayer = function() {
     this.x = 202.5;
     this.y = 375;
 };
 
-// Draw Player, score and heart images. This method invoked by renderEntities() on each game tick.
+/* Draw Player, score and heart images. This method invoked by renderEntities() on each game tick.
+ */
 Player.prototype.render = function() {
     var text, i;
     // Draw Player image.
@@ -109,9 +118,10 @@ Player.prototype.render = function() {
     }
 };
 
-// This method is invoked by a function called in addEventListener() method. It moves Player
-// according to user input within defined boundaries.
-// param key - values received from allowedKeys object.
+/* This method is invoked by a function called in addEventListener() method. It moves Player
+ * according to user input within defined boundaries.
+ * param key - values received from allowedKeys object.
+ */
 Player.prototype.handleInput = function(key) {
     if (key === "left" && this.x > 0.5) {
         this.x -= 101;
@@ -122,8 +132,9 @@ Player.prototype.handleInput = function(key) {
     } else if (key === "down" && this.y < 375) {
         this.y += 83;
     } else if (key === "enter") {
-        // Assign a sprite image based on a selection.
-        // Reset x, y, scoreCount, heartCount and tester properties.
+        /* Assign a sprite image based on a selection.
+         * Reset x, y, scoreCount, heartCount and tester properties.
+         */
         switch (this.x) {
             case 0.5: this.sprite = "images/char-cat-girl.png"; break;
             case 101.5: this.sprite = "images/char-horn-girl.png"; break;
@@ -138,17 +149,9 @@ Player.prototype.handleInput = function(key) {
     }
 };
 
-// Instantiate 4 Enemies and place them in allEnemies array. Invoked at the beginning of
-// each new game by reset().
-function spawnEnemies() {
-    for (var i = 0; i < 4; i++) {
-        enemy = new Enemy();
-        allEnemies.push(enemy);
-    }
-}
-
-// This function randomly returns one of the defined values that are used for Y coordinates in Enemy objects.
-// Invoked by Enemy constructor and enemy.update() method.
+/* This function randomly returns one of the defined values that are used for Y coordinates in Enemy objects.
+ * Invoked by Enemy constructor and enemy.update() method.
+ */
 function randomY() {
     var yCoordinates = [43, 126, 209, 292];
     function f() {
@@ -158,8 +161,19 @@ function randomY() {
     return f();
 }
 
-// This listens for key presses and sends the key values to player.handleInput()
-// and selector.handlePlayerSelection() methods.
+/* Instantiate 4 Enemies and place them in allEnemies array. Invoked at the beginning of
+ * each new game by reset().
+ */
+function spawnEnemies() {
+    for (var i = 0; i < 4; i++) {
+        enemy = new Enemy();
+        allEnemies.push(enemy);
+    }
+}
+
+/* This listens for key presses and sends the key values to player.handleInput()
+ * and selector.handlePlayerSelection() methods.
+ */
 document.addEventListener("keydown", function(e) {
     var allowedKeys = {
         37: "left",
